@@ -5,7 +5,8 @@ const mysql = require('lib/mysql');
   REQUIRED
   RETURN
     {
-      id: number, name: string, joined: date-string, reputation: number
+      id: number, name: string, joined: date-string, reputation: number,
+      buttons: number, presets: number
     }
   DESCRIPTION
     Return user's public information
@@ -19,13 +20,15 @@ module.exports = function(req, res) {
     .then(() => {
       const sql = `
         SELECT
-          id, display_name AS name, joined, reputation
+          id, display_name AS name, joined, reputation, (
+            SELECT COUNT(id) FROM buttons WHERE user_id = ?
+          ) AS buttons, (
+            SELECT COUNT(id) FROM presets WHERE user_id = ?
+          ) AS presets
         FROM users
         WHERE id = ?
       `,
-      vars = [
-        req.params.user
-      ];
+      vars = Array(3).fill(req.params.user);
 
       return db.query(sql, vars);
     })
