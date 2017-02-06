@@ -29,7 +29,12 @@ app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
 // Express middleware / controllers
-app.use('/api', require('./controllers/'));
+app.use(
+  '/api',
+  require('middleware/override-res-json'),
+  require('controllers/')
+);
+
 app.get('/*', (req, res) => {
   if (config.environment.type == 'dev') {
     req.session.uid = 1,
