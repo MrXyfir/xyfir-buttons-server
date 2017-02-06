@@ -38,6 +38,9 @@ router.delete(
 router.post(
   '/buttons/:button/fork', require('./buttons/fork')
 );
+router.get(
+  '/buttons/:button/script', require('./buttons/get-script')
+);
 
 /* PRESETS */
 router.get(
