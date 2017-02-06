@@ -11,27 +11,30 @@ const mysql = require('lib/mysql');
     search: string, lastId: number
   RETURN
     {
-      users: [{
+      error: boolean, message?: string, users?: [{
         id: number, name: string, joined: date-string,
         reputation: number
       }]
     }
   DESCRIPTION
-    Return up to 50 matching users
+    Return up to 25 matching users
 */
 module.exports = function(req, res) {
 
+  const q = req.query;
+
   // Validate sort values
-  if (!['reputation', 'joined'].includes(q.order)) {
-    res.json({ users: [] });
-    return;
+  try {
+    if (!['reputation', 'joined'].includes(q.order))
+      throw 'Invalid order field value';
+    else if (!['asc', 'desc'].includes(q.direction))
+      throw 'Invalid order direction valid';
   }
-  else if (!['asc', 'desc'].includes(q.direction)) {
-    res.json({ users: [] });
-    return;
+  catch (e) {
+    res.json({ error: true, message: e });
   }
 
-  const db = new mysql(), q = req.query;
+  const db = new mysql();
 
   db.getConnection()
     .then(() => {
@@ -44,10 +47,10 @@ module.exports = function(req, res) {
         SELECT
           id, display_name AS name, joined, reputation
         FROM users
-        WHERE name LIKE ? ${whereId}
+        WHERE display_name LIKE ? ${whereId}
         ORDER BY
           ${q.order} ${q.direction}
-        LIMIT 51
+        LIMIT 25
       `,
       vars = [
         '%' + (q.search || '') + '%'
@@ -57,11 +60,11 @@ module.exports = function(req, res) {
     })
     .then(users => {
       db.release();
-      res.json({ users });
+      res.json({ error: false, users });
     })
     .catch(err => {
       db.release();
-      res.json({ users: [] });
+      res.json({ error: true, message: err });
     });
 
 };
