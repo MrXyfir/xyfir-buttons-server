@@ -45,9 +45,9 @@ module.exports = function(req, res) {
       return db.query(sql, vars);
     })
     .then(rows => {
-      if (!vote.targetOwner) throw 'Could not find target';
-
       vote = rows[0];
+      
+      if (vote.targetOwner == null) throw 'Could not find target';
 
       // Delete vote
       if (req.body.vote == 0) {
@@ -65,7 +65,6 @@ module.exports = function(req, res) {
           INSERT INTO
             votes (target_type, target_id, user_id, vote)
             VALUES (?, ?, ?, ?)
-          }
           ON DUPLICATE KEY UPDATE vote = ?;
         `,
         vars = [
