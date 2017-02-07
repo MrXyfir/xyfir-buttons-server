@@ -50,7 +50,7 @@ module.exports = function(req, res) {
       vars = {
         preset_id: req.params.preset, button_id: req.params.button,
         size: +req.body.size, position: req.body.position,
-        modifications: req.body.modifications
+        modifications: (req.body.modifications || '{}')
       };
 
       return db.query(sql, vars);
