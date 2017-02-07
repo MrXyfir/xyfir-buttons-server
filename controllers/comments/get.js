@@ -13,7 +13,8 @@ const mysql = require('lib/mysql');
   RETURN
     {
       comments: [{
-        id: number, created: date-string, comment: string, creator: {
+        id: number, created: date-string, comment: string, votes: number,
+        creator: {
           id: number, name: string, reputation: number
         }, 
       }]
@@ -52,7 +53,7 @@ module.exports = function(req, res) {
               : ''
           }
         ORDER BY ${req.query.order} ${req.query.direction}
-        LIMIT 26
+        LIMIT 25
       `,
       vars = [
         req.params.id, req.params.type,
