@@ -29,8 +29,8 @@ module.exports = function(req, res) {
     .then(result => {
       if (!result.affectedRows) throw 'Could not delete preset';
 
-      db.release();
       res.json({ error: false });
+      deleteLinkedItems(db, 2, req.params.preset);
     })
     .catch(err => {
       db.release();
