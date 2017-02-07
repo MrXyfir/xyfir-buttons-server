@@ -16,8 +16,14 @@ module.exports = function(req, res) {
     '', 'buttons', 'presets'
   ][+req.params.type];
 
-  if (!table || !req.body.comment) {
-    res.json({ error: true, message: 'Invalid input' });
+  try {
+    if (!table || !req.body.comment)
+      throw 'Invalid input';
+    if (!req.session.uid)
+      throw 'You must be logged in to post comments';
+  }
+  catch (e) {
+    res.json({ error: true, message: e });
     return;
   }
 
