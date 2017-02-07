@@ -46,11 +46,10 @@ module.exports = function(req, res) {
     .then(result => {
       if (!result.affectedRows) throw 'Could not delete button';
 
-      res.json({ error: false });
-
       return markPresetsUpdated(db, presets, true);
     })
     .then(result => {
+      res.json({ error: false });
       deleteLinkedItems(db, 1, req.params.button);
     })
     .catch(err => {
