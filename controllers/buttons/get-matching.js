@@ -16,8 +16,8 @@ const mysql = require('lib/mysql');
     {
       buttons: [{
         id: number, name: string, description: string, uriMatch: string,
-        created: date-string, updated: date-string, downloads: number,
-        domains: string
+        created: date-string, updated: date-string, domains: string,
+        downloads: null|number
       }]
     }
   DESCRIPTION
@@ -27,15 +27,15 @@ const mysql = require('lib/mysql');
 module.exports = function(req, res) {
 
   const q = req.query;
-  let error = false;
 
-  // Validate values
-  if (!['downloads', 'created', 'updated'].includes(q.order))
-    error = true;
-  if (!['asc', 'desc'].includes(q.direction))
-    error = true;
-
-  if (error) {
+  try {
+    // Validate values
+    if (!['downloads', 'created', 'updated'].includes(q.order))
+      throw 'Invalid order by value';
+    if (!['asc', 'desc'].includes(q.direction))
+      throw 'Invalid order direction value';
+  }
+  catch (e) {
     res.json({ buttons: [] });
     return;
   }
@@ -44,7 +44,7 @@ module.exports = function(req, res) {
 
   db.getConnection()
     .then(() => {
-      let whereSearch = '';
+      let whereSearch = '', wrap = false;
 
       // Build portion of query to handle search
       if (q.searchType && q.searchQuery) {
@@ -52,20 +52,22 @@ module.exports = function(req, res) {
 
         switch (q.searchType) {
           case 'name':
-            whereSearch += 'name LIKE %?%';
+            whereSearch += 'name LIKE ?',
+            wrap = true;
             break;
           case 'uri':
             whereSearch += '? REGEXP uri_match';
             break;
           case 'site':
-            whereSearch += `(domains LIKE %?% OR domains = '*')`
+            whereSearch += `(domains LIKE ? OR domains = '*')`,
+            wrap = true;
             break;
           case 'user':
             whereSearch += 'user_id = ?';
             break;
           case 'preset':
-            whereSearch += `button_id IN (
-              SELECT id FROM preset_buttons WHERE preset_id = ?
+            whereSearch += `id IN (
+              SELECT button_id FROM preset_buttons WHERE preset_id = ?
             )`; break;
           default:
             whereSearch = '';
@@ -82,16 +84,16 @@ module.exports = function(req, res) {
           id, name, description, uri_match AS uriMatch, created, updated,
           domains, (
             SELECT SUM(downloads) FROM downloads
-            WHERE target_id = ? AND target_type = 1
+            WHERE target_id = buttons.id AND target_type = 1
           ) AS downloads
         FROM buttons
         WHERE
           is_listed = 1 ${whereId} ${whereSearch}
         ORDER BY ${q.order} ${q.direction}
-        LIMIT 26
+        LIMIT 25
       `,
       vars = [
-        whereSearch ? ('%' + q.searchQuery + '%') : ''
+        whereSearch ? (wrap ? ('%' + q.searchQuery + '%') : q.searchQuery) : ''
       ];
 
       return db.query(sql, vars);
