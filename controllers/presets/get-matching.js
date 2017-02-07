@@ -44,7 +44,7 @@ module.exports = function(req, res) {
 
   db.getConnection()
     .then(() => {
-      let whereSearch = '';
+      let whereSearch = '', wrap = false;
 
       // Build portion of query to handle search
       if (q.searchType && q.searchQuery) {
@@ -52,13 +52,15 @@ module.exports = function(req, res) {
 
         switch (q.searchType) {
           case 'name':
-            whereSearch += 'name LIKE %?%';
+            whereSearch += 'name LIKE ?',
+            wrap = true;
             break;
           case 'uri':
             whereSearch += '? REGEXP uri_match';
             break;
           case 'site':
-            whereSearch += `(domains LIKE %?% OR domains = '*')`
+            whereSearch += `(domains LIKE ? OR domains = '*')`,
+            wrap = true;
             break;
           case 'user':
             whereSearch += 'user_id = ?';
@@ -78,16 +80,16 @@ module.exports = function(req, res) {
           id, name, description, uri_match AS uriMatch, created, updated,
           domains, (
             SELECT SUM(downloads) FROM downloads
-            WHERE target_id = ? AND target_type = 2
+            WHERE target_id = presets.id AND target_type = 2
           ) AS downloads
         FROM presets
         WHERE
           is_listed = 1 ${whereId} ${whereSearch}
         ORDER BY ${q.order} ${q.direction}
-        LIMIT 26
+        LIMIT 25
       `,
       vars = [
-        whereSearch ? ('%' + q.searchQuery + '%') : ''
+        whereSearch ? (wrap ? ('%' + q.searchQuery + '%') : q.searchQuery) : ''
       ];
 
       return db.query(sql, vars);
