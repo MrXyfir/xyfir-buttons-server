@@ -1,3 +1,4 @@
+const deleteLinked = require('lib/items/delete-linked');
 const mysql = require('lib/mysql');
 
 /*
@@ -23,12 +24,13 @@ module.exports = function(req, res) {
       return db.query(sql, vars);
     })
     .then(result => {
-      db.release();
-
-      if (!result.affectedRows)
+      if (!result.affectedRows) {
         throw 'Could not delete comment';
-      else
+      }
+      else {
         res.json({ error: false });
+        deleteLinked(db, 3, req.params.comment);
+      }
     })
     .catch(err => {
       db.release();
