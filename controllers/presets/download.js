@@ -4,10 +4,10 @@ const mysql = require('lib/mysql');
   GET api/presets/download
   REQUIRED
     presets: json-string
-      '[{id: number, version: date-string}]'
+      '[{id: number, updated: date-string}]'
   RETURN
     {
-      presets: [{
+      error: boolean, message?: string, presets?: [{
         id: number, creator: number, name: string, description: string,
         isListed: boolean, uriMatch: string, domains: string,
         created: date-string, updated: date-string,
@@ -18,14 +18,19 @@ const mysql = require('lib/mysql');
     }
   DESCRIPTION
     Download presets with a newer version than provided
-    Returns empty array on error
 */
 module.exports = function(req, res) {
 
-  const presets = JSON.parse(req.query.presets || '[]');
+  let presets = [];
+  
+  try {
+    presets = JSON.parse(req.query.presets || '[]');
 
-  if (!presets.length) {
-    res.json({ presets: [] });
+    if (!Array.isArray(presets) || !presets.length)
+      throw 'Invalid or empty presets array';
+  }
+  catch (e) {
+    res.json({ error: false, message: e });
     return;
   }
 
@@ -36,7 +41,7 @@ module.exports = function(req, res) {
     .then(() => {
       // Get updated column for all requested presets
       sql = `
-        SELECT id, updated FROM presets id IN (?)
+        SELECT id, updated FROM presets WHERE id IN (?)
       `,
       vars = [
         presets.map(b => b.id)
@@ -56,6 +61,8 @@ module.exports = function(req, res) {
         return shouldDownload ? p1.id : -1;
       }).filter(p => p > -1);
 
+      if (!downloads.length) throw 'No presets to update';
+
       // Get full data for presets being downloaded
       sql = `
         SELECT
@@ -72,8 +79,12 @@ module.exports = function(req, res) {
     .then(rows => {
       if (!rows.length) throw 'No presets found';
 
+      downloads = rows.map(r => r.id),
       response.presets = rows,
-      downloads = rows.map(r => r.id);
+      response.presets = response.presets.map(p => {
+        p.buttons = [];
+        return p;
+      });
 
       sql = `
         SELECT * FROM preset_buttons WHERE preset_id IN (?)
@@ -88,10 +99,11 @@ module.exports = function(req, res) {
       // Add buttons to response.presets[i].buttons
       // Parse response.presets[i].buttons[i].modifications
       rows.forEach(r => {
-        for (let i; i < response.presets.length; i++) {
-          if (r.preset_id == preset.id) {
+        for (let i = 0; i < response.presets.length; i++) {
+          if (r.preset_id == response.presets[i].id) {
             r.modifications = JSON.parse(r.modifications);
             response.presets[i].buttons.push(r);
+            
             break;
           }
         }
@@ -102,8 +114,8 @@ module.exports = function(req, res) {
         INSERT INTO downloads
           (target_type, target_id, day, downloads)
         VALUES ${
-          downloads.map(p =>
-            `('2', '${p.id}', CUR_DATE(), '1')`
+          downloads.map(id =>
+            `('2', '${id}', CURDATE(), '1')`
           ).join(', ')
         }
         ON DUPLICATE KEY UPDATE downloads = downloads + 1
@@ -117,7 +129,7 @@ module.exports = function(req, res) {
     })
     .catch(err => {
       db.release();
-      res.json({ presets: [] });
+      res.json({ error: false, message: err });
     });
 
 };
