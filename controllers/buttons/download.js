@@ -4,10 +4,10 @@ const mysql = require('lib/mysql');
   GET api/buttons/download
   REQUIRED
     buttons: json-string
-      '[{id: number, version: date-string}]'
+      '[{id: number, updated: date-string}]'
   RETURN
     {
-      buttons: [{
+      error: boolean, message?: string, buttons?: [{
         id: number, creator: number, name: string, description: string,
         isListed: boolean, uriMatch: string, script: string,
         created: date-string, updated: date-string,
@@ -16,14 +16,19 @@ const mysql = require('lib/mysql');
     }
   DESCRIPTION
     Download buttons with a newer version than provided
-    Returns empty array on error
 */
 module.exports = function(req, res) {
 
-  const buttons = JSON.parse(req.query.buttons || '[]');
-
-  if (!buttons.length) {
-    res.json({ buttons: [] });
+  let buttons = [];
+  
+  try {
+    buttons = JSON.parse(req.query.buttons || '[]');
+    
+    if (!Array.isArray(buttons) || !buttons.length)
+      throw 'Invalid or empty buttons array';
+  }
+  catch (e) {
+    res.json({ error: true, message: e });
     return;
   }
 
@@ -44,7 +49,7 @@ module.exports = function(req, res) {
     })
     .then(rows => {
       if (!rows.length) throw 'No buttons found';
-
+      
       // Find buttons that need to be updated
       const downloads = rows.map(b1 => {
         const shouldDownload = buttons.findIndex(
@@ -54,11 +59,13 @@ module.exports = function(req, res) {
         return shouldDownload ? b1.id : -1;
       }).filter(b => b > -1);
 
+      if (!downloads.length) throw 'No buttons to update';
+
       // Get full data for buttons being downloaded
       sql = `
         SELECT
-          id, user_id AS creator, description, domains, script, created,
-          is_listed AS isListed, uri_match AS uriMatch, updated
+          id, user_id AS creator, description, domains, script, created, updated,
+          is_listed AS isListed, uri_match AS uriMatch, updated, repository
         FROM buttons WHERE id IN (?)
       `,
       vars = [
@@ -70,7 +77,7 @@ module.exports = function(req, res) {
     .then(rows => {
       if (!rows.length) throw 'No buttons found';
 
-      res.json({ buttons: rows });
+      res.json({ error: false, buttons: rows });
 
       // Increment each button's downloads for the day
       sql = `
@@ -78,7 +85,7 @@ module.exports = function(req, res) {
           (target_type, target_id, day, downloads)
         VALUES ${
           rows.map(r =>
-            `('1', '${r.id}', CUR_DATE(), '1')`
+            `('1', '${r.id}', CURDATE(), '1')`
           ).join(', ')
         }
         ON DUPLICATE KEY UPDATE downloads = downloads + 1
@@ -91,7 +98,7 @@ module.exports = function(req, res) {
     })
     .catch(err => {
       db.release();
-      res.json({ buttons: [] });
+      res.json({ error: true, message: err });
     });
 
 };
