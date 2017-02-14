@@ -38,9 +38,9 @@ module.exports = function(req, res) {
       // Copy rows in preset_buttons table
       sql = `
         INSERT INTO preset_buttons
-          (preset_id, button_id, size, position, modifications)
+          (preset_id, button_id, size, position, styles)
           SELECT
-            ?, button_id, size, position, modifications
+            ?, button_id, size, position, styles
           FROM preset_buttons
           WHERE preset_id = ?
       `,

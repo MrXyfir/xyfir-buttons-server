@@ -4,7 +4,7 @@ const mysql = require('lib/mysql');
 /*
   POST api/presets/:preset/buttons/:button
   REQUIRED
-    size: number, position: string, modifications: json-string
+    size: string, position: string, styles: json-string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -49,8 +49,8 @@ module.exports = function(req, res) {
       `,
       vars = {
         preset_id: req.params.preset, button_id: req.params.button,
-        size: +req.body.size, position: req.body.position,
-        modifications: (req.body.modifications || '{}')
+        size: req.body.size, position: req.body.position,
+        styles: (req.body.styles || '{}')
       };
 
       return db.query(sql, vars);

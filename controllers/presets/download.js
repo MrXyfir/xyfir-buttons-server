@@ -12,7 +12,7 @@ const mysql = require('lib/mysql');
         isListed: boolean, uriMatch: string, domains: string,
         created: date-string, updated: date-string,
         buttons: [{
-          id: number, size: number, position: string, modifications: object
+          id: number, size: string, position: string, styles: object
         }]
       }]
     }
@@ -97,11 +97,11 @@ module.exports = function(req, res) {
     })
     .then(rows => {
       // Add buttons to response.presets[i].buttons
-      // Parse response.presets[i].buttons[i].modifications
+      // Parse response.presets[i].buttons[i].styles
       rows.forEach(r => {
         for (let i = 0; i < response.presets.length; i++) {
           if (r.preset_id == response.presets[i].id) {
-            r.modifications = JSON.parse(r.modifications);
+            r.styles = JSON.parse(r.styles);
             response.presets[i].buttons.push(r);
             
             break;

@@ -4,7 +4,7 @@ const mysql = require('lib/mysql');
 /*
   PUT api/presets/:preset/buttons/:button
   REQUIRED
-    size: number, position: string, modifications: json-string
+    size: string, position: string, styles: json-string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -20,14 +20,14 @@ module.exports = function(req, res) {
       // and row exists in preset_buttons
       const sql = `
         UPDATE preset_buttons SET
-          size = ?, position = ?, modifications = ?
+          size = ?, position = ?, styles = ?
         WHERE
           button_id = ? AND preset_id IN (
             SELECT id FROM presets WHERE id = ? AND user_id = ?
           )
       `,
       vars = [
-        req.body.size, req.body.position, (req.body.modifications || '{}'),
+        req.body.size, req.body.position, (req.body.styles || '{}'),
         req.params.button,
         req.params.preset, req.session.uid
       ];
