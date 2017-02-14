@@ -9,9 +9,9 @@ const mysql = require('lib/mysql');
     {
       error: boolean, message?: string, buttons?: [{
         id: number, creator: number, name: string, description: string,
-        isListed: boolean, uriMatch: string, script: string,
-        created: date-string, updated: date-string,
-        domains: string
+        isListed: boolean, uriMatch: string, script: json-string,
+        created: date-string, updated: date-string, icon: string,
+        domains: string, tooltip: string, styles: json-string
       }]
     }
   DESCRIPTION
@@ -65,7 +65,8 @@ module.exports = function(req, res) {
       sql = `
         SELECT
           id, user_id AS creator, description, domains, script, created, updated,
-          is_listed AS isListed, uri_match AS uriMatch, updated, repository
+          is_listed AS isListed, uri_match AS uriMatch, updated, repository,
+          tooltip, styles, icon
         FROM buttons WHERE id IN (?)
       `,
       vars = [

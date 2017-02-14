@@ -33,12 +33,14 @@ module.exports = function(req, res) {
       sql = `
         UPDATE buttons SET
           name = ?, description = ?, is_listed = ?, uri_match = ?,
-          domains = ?, script = ?, updated = NOW(), repository = ?
+          domains = ?, script = ?, updated = NOW(), repository = ?,
+          tooltip = ?, styles = ?, icon = ?
         WHERE id = ? AND user_id = ?
       `,
       vars = [
         button.name, button.description, button.is_listed, button.uri_match,
         button.domains, button.script, button.repository,
+        button.tooltip, button.styles, button.icon,
         req.params.button, req.session.uid
       ];
 
