@@ -4,7 +4,7 @@ const mysql = require('lib/mysql');
 /*
   PUT api/presets/:preset
   REQUIRED
-    name: string, uriMatch: string
+    name: string, urlMatch: string
   OPTIONAL
     description: string, domains: string, isListed: boolean
   RETURN
@@ -31,12 +31,12 @@ module.exports = function(req, res) {
       const sql = `
         UPDATE presets SET
           name = ?, description = ?, is_listed = ?, updated = NOW(),
-          domains = ?, uri_match = ?
+          domains = ?, url_match = ?
         WHERE id = ? AND user_id = ?
       `,
       vars = [
         preset.name, preset.description, preset.is_listed,
-        preset.uri_match, preset.domains,
+        preset.url_match, preset.domains,
         req.params.preset, req.session.uid
       ];
 

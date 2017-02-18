@@ -4,10 +4,11 @@ const mysql = require('lib/mysql');
 /*
   POST api/buttons
   REQUIRED
-    name: string, uriMatch: string,
+    name: string, urlMatch: string,
     script: string OR repository: string,
   OPTIONAL
-    description: string, domains: string, isListed: boolean
+    description: string, domains: string, isListed: boolean,
+    tooltip: string, styles: string, icon: string
   RETURN
     { error: boolean, message?: string, id?: number }
   DESCRIPTION

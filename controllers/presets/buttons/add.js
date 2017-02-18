@@ -4,7 +4,7 @@ const mysql = require('lib/mysql');
 /*
   POST api/presets/:preset/buttons/:button
   REQUIRED
-    size: string, position: string, styles: json-string
+    size: string, position: string, styles: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION

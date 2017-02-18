@@ -16,12 +16,12 @@ module.exports = function(req, res) {
       const sql = `
         INSERT INTO buttons
           (
-            user_id, name, description, is_listed, uri_match, domains,
-            script, repository
+            user_id, name, description, is_listed, url_match, domains, tooltip,
+            script, repository, styles, icon
           )
           SELECT
-            ?, name, description, is_listed, uri_match, domains,
-            script, repository
+            ?, name, description, is_listed, url_match, domains, tooltip,
+            script, repository, styles, icon
           FROM buttons
           WHERE id = ?
       `,

@@ -9,10 +9,10 @@ const mysql = require('lib/mysql');
     {
       error: boolean, message?: string, presets?: [{
         id: number, creator: number, name: string, description: string,
-        isListed: boolean, uriMatch: string, domains: string,
+        isListed: boolean, urlMatch: string, domains: string,
         created: date-string, updated: date-string,
         buttons: [{
-          id: number, size: string, position: string, styles: object
+          id: number, size: string, position: string, styles: string
         }]
       }]
     }
@@ -67,7 +67,7 @@ module.exports = function(req, res) {
       sql = `
         SELECT
           id, user_id AS creator, name, description, domains, created,
-          is_listed AS isListed, uri_match AS uriMatch, updated
+          is_listed AS isListed, url_match AS urlMatch, updated
         FROM presets WHERE id IN (?)
       `,
       vars = [
@@ -97,13 +97,10 @@ module.exports = function(req, res) {
     })
     .then(rows => {
       // Add buttons to response.presets[i].buttons
-      // Parse response.presets[i].buttons[i].styles
       rows.forEach(r => {
         for (let i = 0; i < response.presets.length; i++) {
           if (r.preset_id == response.presets[i].id) {
-            r.styles = JSON.parse(r.styles);
             response.presets[i].buttons.push(r);
-            
             break;
           }
         }

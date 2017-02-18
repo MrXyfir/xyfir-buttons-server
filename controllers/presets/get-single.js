@@ -5,7 +5,7 @@ const mysql = require('lib/mysql');
   GET api/presets/:preset
   RETURN
     {
-      id: number, name: string, uriMatch: string, isListed: boolean,
+      id: number, name: string, urlMatch: string, isListed: boolean,
       description: string, domains: string, created: date-string,
       updated: date-string, creator: {
         id: number, name: string, reputation: number
@@ -23,7 +23,7 @@ module.exports = function(req, res) {
     .then(() => {
       const sql = `
         SELECT
-          id, user_id, name, uri_match AS uriMatch, description,
+          id, user_id, name, url_match AS urlMatch, description,
           domains, is_listed AS isListed, created, updated
         FROM presets WHERE id = ?
       `,

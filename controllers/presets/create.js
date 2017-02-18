@@ -4,7 +4,7 @@ const mysql = require('lib/mysql');
 /*
   POST api/presets
   REQUIRED
-    name: string, uriMatch: string
+    name: string, urlMatch: string
   OPTIONAL
     description: string, domains: string, isListed: boolean
   RETURN

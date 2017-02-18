@@ -18,9 +18,9 @@ module.exports = function(req, res) {
       // Copy row in presets table
       sql = `
         INSERT INTO presets
-          (user_id, name, description, is_listed, uri_match, domains)
+          (user_id, name, description, is_listed, url_match, domains)
           SELECT
-            ?, name, description, is_listed, uri_match, domains
+            ?, name, description, is_listed, url_match, domains
           FROM presets
           WHERE id = ?
       `,

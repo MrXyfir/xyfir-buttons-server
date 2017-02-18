@@ -9,13 +9,13 @@ const mysql = require('lib/mysql');
       'asc|desc'
   OPTIONAL
     searchType: string
-      'name|uri|site|user|preset'
+      'name|url|site|user|preset'
     searchQuery: string
     lastId: number
   RETURN
     {
       buttons: [{
-        id: number, name: string, description: string, uriMatch: string,
+        id: number, name: string, description: string, urlMatch: string,
         created: date-string, updated: date-string, domains: string,
         downloads: null|number
       }]
@@ -55,8 +55,8 @@ module.exports = function(req, res) {
             whereSearch += 'name LIKE ?',
             wrap = true;
             break;
-          case 'uri':
-            whereSearch += '? REGEXP uri_match';
+          case 'url':
+            whereSearch += '? REGEXP url_match';
             break;
           case 'site':
             whereSearch += `(domains LIKE ? OR domains = '*')`,
@@ -81,7 +81,7 @@ module.exports = function(req, res) {
         : '',
       sql = `
         SELECT
-          id, name, description, uri_match AS uriMatch, created, updated,
+          id, name, description, url_match AS urlMatch, created, updated,
           domains, (
             SELECT SUM(downloads) FROM downloads
             WHERE target_id = buttons.id AND target_type = 1

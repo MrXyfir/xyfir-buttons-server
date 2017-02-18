@@ -5,10 +5,11 @@ const mysql = require('lib/mysql');
 /*
   PUT api/buttons/:button
   REQUIRED
-    name: string, uriMatch: string,
+    name: string, urlMatch: string,
     script: string OR repository: string,
   OPTIONAL
-    description: string, domains: string, isListed: boolean
+    description: string, domains: string, isListed: boolean,
+    tooltip: string, styles: string, icon: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -32,13 +33,13 @@ module.exports = function(req, res) {
       // Anonymously created buttons cannot be updated
       sql = `
         UPDATE buttons SET
-          name = ?, description = ?, is_listed = ?, uri_match = ?,
+          name = ?, description = ?, is_listed = ?, url_match = ?,
           domains = ?, script = ?, updated = NOW(), repository = ?,
           tooltip = ?, styles = ?, icon = ?
         WHERE id = ? AND user_id = ?
       `,
       vars = [
-        button.name, button.description, button.is_listed, button.uri_match,
+        button.name, button.description, button.is_listed, button.url_match,
         button.domains, button.script, button.repository,
         button.tooltip, button.styles, button.icon,
         req.params.button, req.session.uid

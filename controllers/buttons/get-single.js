@@ -5,7 +5,7 @@ const mysql = require('lib/mysql');
   GET api/buttons/:button
   RETURN
     {
-      id: number, name: string, uriMatch: string, repository: string,
+      id: number, name: string, urlMatch: string, repository: string,
       isListed: boolean, description: string, domains: string,
       created: date-string, updated: date-string, creator: {
         id: number, name: string, reputation: number
@@ -23,7 +23,7 @@ module.exports = function(req, res) {
     .then(() => {
       const sql = `
         SELECT
-          id, user_id, name, uri_match AS uriMatch, repository, description,
+          id, user_id, name, url_match AS urlMatch, repository, description,
           domains, is_listed AS isListed, created, updated
         FROM buttons WHERE id = ?
       `,
