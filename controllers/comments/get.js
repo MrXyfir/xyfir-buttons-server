@@ -46,7 +46,7 @@ module.exports = function(req, res) {
         FROM comments
         WHERE
           target_id = ? AND target_type = ? ${
-            req.query.lastId
+            !!+req.query.lastId
               ? `AND id ${
                   req.query.direction == 'asc' ? '<' : '>'
                 } ${+req.query.lastId}`

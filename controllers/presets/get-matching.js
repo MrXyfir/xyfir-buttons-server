@@ -70,7 +70,7 @@ module.exports = function(req, res) {
         }
       }
 
-      const whereId = q.lastId
+      const whereId = !!+q.lastId
         ? `AND id ${
             q.direction == 'asc' ? '<' : '>'
           } ${+q.lastId}`

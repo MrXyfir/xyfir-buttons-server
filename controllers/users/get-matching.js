@@ -38,7 +38,7 @@ module.exports = function(req, res) {
 
   db.getConnection()
     .then(() => {
-      const whereId = q.lastId
+      const whereId = !!+q.lastId
         ? `AND id ${
             q.direction == 'asc' ? '<' : '>'
           } ${+q.lastId}`
