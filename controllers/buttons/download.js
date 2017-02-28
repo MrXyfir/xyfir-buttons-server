@@ -64,9 +64,9 @@ module.exports = function(req, res) {
       // Get full data for buttons being downloaded
       sql = `
         SELECT
-          id, user_id AS creator, description, domains, script, created, updated,
-          is_listed AS isListed, url_match AS urlMatch, updated, repository,
-          tooltip, styles, icon
+          id, name, user_id AS creator, description, domains, script, created,
+          updated, is_listed AS isListed, url_match AS urlMatch, updated,
+          repository, tooltip, styles, icon
         FROM buttons WHERE id IN (?)
       `,
       vars = [
