@@ -4,7 +4,7 @@ const mysql = require('lib/mysql');
   GET api/buttons/:button/script
   RETURN
     {
-      error: boolean, message?: string, script?: { [file]: string }
+      error: boolean, message?: string, script?: string
     }
   DESCRIPTION
     Returns a button's script, should only be used for the interface
@@ -28,7 +28,7 @@ module.exports = function(req, res) {
       if (!rows.length) throw 'Could not find button';
       
       db.release();
-      res.json({ error: false, script: JSON.parse(rows[0].script) });
+      res.json({ error: false, script: rows[0].script });
     })
     .catch(err => {
       db.release();
