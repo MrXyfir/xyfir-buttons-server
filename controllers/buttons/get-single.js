@@ -9,42 +9,47 @@ const mysql = require('lib/mysql');
       isListed: boolean, description: string, domains: string,
       created: date-string, updated: date-string, creator: {
         id: number, name: string, reputation: number
-      }
+      }, votes: number, downloads: number, comments: number
     }
   DESCRIPTION
     Returns the full data for a single button
     Id is -1 if button could not be found
 */
-module.exports = function(req, res) {
+module.exports = async function(req, res) {
 
   const db = new mysql();
 
-  db.getConnection()
-    .then(() => {
-      const sql = `
-        SELECT
-          id, user_id, name, url_match AS urlMatch, repository, description,
-          domains, is_listed AS isListed, created, updated
-        FROM buttons WHERE id = ?
-      `,
-      vars = [
-        req.params.button
-      ];
+  try {
+    await db.getConnection();
 
-      return db.query(sql, vars);
-    })
-    .then(rows => {
-      if (!rows.length) throw 'Could not find button';
+    const sql = `
+      SELECT
+        id, user_id, name, url_match AS urlMatch, repository, description,
+        domains, is_listed AS isListed, created, updated, (
+          SELECT SUM(vote) FROM votes WHERE target_id = ? AND target_type = 1
+        ) AS votes, (
+          SELECT SUM(downloads) FROM downloads
+          WHERE target_id = ? AND target_type = 1
+        ) AS downloads, (
+          SELECT COUNT(id) FROM comments
+          WHERE target_id = ? AND target_type = 1
+        ) AS comments
+      FROM buttons WHERE id = ?
+    `,
+    vars = new Array(4).fill(req.params.button);
 
-      return getCreatorInfo(db, rows);
-    })
-    .then(rows => {
-      db.release();
-      res.json(rows[0]);
-    })
-    .catch(err => {
-      db.release();
-      res.json({ id: -1 });
-    });
+    let rows = await db.query(sql, vars);
+
+    if (!rows.length) throw 'Could not find button';
+
+    rows = await getCreatorInfo(db, rows);
+
+    db.release();
+    res.json(rows[0]);
+  }
+  catch (err) {
+    db.release();
+    res.json({ id: -1 });
+  }
 
 };
