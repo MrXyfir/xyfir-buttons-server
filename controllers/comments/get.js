@@ -1,4 +1,5 @@
 const getCreatorInfo = require('lib/users/get-creator-info');
+const getVotes = require('lib/items/get-votes');
 const mysql = require('lib/mysql');
 
 /*
@@ -23,7 +24,7 @@ const mysql = require('lib/mysql');
     Get comments for a target object
     Returns empty comments array on error
 */
-module.exports = function(req, res) {
+module.exports = async function(req, res) {
 
   if (
     !['votes', 'created'].includes(req.query.order)
@@ -35,45 +36,52 @@ module.exports = function(req, res) {
 
   const db = new mysql();
 
-  db.getConnection()
-    .then(() => {
-      const sql = `
-        SELECT
-          id, user_id, created, comment, (
-            SELECT SUM(vote) FROM votes
-            WHERE target_id = ? AND target_type = ?
-          ) AS votes
-        FROM comments
-        WHERE
-          target_id = ? AND target_type = ? ${
-            !!+req.query.lastId
-              ? `AND id ${
-                  req.query.direction == 'asc' ? '<' : '>'
-                } ${+req.query.lastId}`
-              : ''
-          }
-        ORDER BY ${req.query.order} ${req.query.direction}
-        LIMIT 25
-      `,
-      vars = [
-        req.params.id, req.params.type,
-        req.params.id, req.params.type
-      ];
+  try {
+    await db.getConnection();
 
-      return db.query(sql, vars);
-    })
-    .then(comments => {
-      if (!comments.length) throw 'No comments found';
+    const sql = `
+      SELECT
+        id, user_id, created, comment
+      FROM comments
+      WHERE
+        target_id = ? AND target_type = ? ${
+          !!+req.query.lastId
+            ? `AND id ${
+                req.query.direction == 'asc' ? '<' : '>'
+              } ${+req.query.lastId}`
+            : ''
+        }
+      ${
+        req.query.order != 'votes'
+        ? `ORDER BY ${req.query.order} ${req.query.direction}` : ''
+      }
+      LIMIT 25
+    `,
+    vars = [
+      req.params.id, req.params.type,
+      req.params.id, req.params.type
+    ];
 
-      return getCreatorInfo(db, comments);
-    })
-    .then(comments => {
-      db.release();
-      res.json({ comments });
-    })
-    .catch(err => {
-      db.release();
-      res.json({ comments: [] });
-    });
+    let comments = await db.query(sql, vars);
+
+    if (!comments.length) throw 'No comments found';
+
+    comments = await getCreatorInfo(db, comments);
+    comments = await getVotes(db, comments, 3);
+
+    db.release();
+
+    if (req.query.order == 'votes') {
+      comments = comments.sort((a, b) => a.votes - b.votes);
+
+      if (req.query.direction == 'desc') comments.reverse();
+    }
+
+    res.json({ comments });
+  }
+  catch (err) {
+    db.release();
+    res.json({ comments: [] });
+  }
 
 };
