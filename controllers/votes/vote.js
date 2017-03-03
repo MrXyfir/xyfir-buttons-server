@@ -18,8 +18,14 @@ module.exports = function(req, res) {
     '', 'buttons', 'presets', 'comments'
   ][+req.params.type];
 
-  if (!table || req.body.vote === undefined) {
-    res.json({ error: true, message: 'Invalid input' });
+  try {
+    if (!table || req.body.vote == undefined)
+      throw 'Invalid input';
+    if (!req.session.uid)
+      throw 'You must be logged in to vote';
+  }
+  catch (e) {
+    res.json({ error: true, message: e });
     return;
   }
 
