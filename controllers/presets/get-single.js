@@ -9,7 +9,7 @@ const mysql = require('lib/mysql');
       description: string, domains: string, created: date-string,
       updated: date-string, creator: {
         id: number, name: string, reputation: number
-      }, votes: number, downloads: number, comments: number
+      }, votes: number, downloads: number, comments: number, buttons: number
     }
   DESCRIPTION
     Returns the full data for a single preset
@@ -32,10 +32,13 @@ module.exports = function(req, res) {
           ) AS downloads, (
             SELECT COUNT(id) FROM comments
             WHERE target_id = ? AND target_type = 2
-          ) AS comments
+          ) AS comments, (
+            SELECT COUNT(button_id) FROM preset_buttons
+            WHERE preset_id = ?
+          ) AS buttons
         FROM presets WHERE id = ?
       `,
-      vars = new Array(4).fill(req.params.preset);
+      vars = new Array(5).fill(req.params.preset);
 
       return db.query(sql, vars);
     })
