@@ -9,7 +9,7 @@ const mysql = require('lib/mysql');
       description: string, domains: string, created: date-string,
       updated: date-string, creator: {
         id: number, name: string, reputation: number
-      }
+      }, votes: number, downloads: number, comments: number
     }
   DESCRIPTION
     Returns the full data for a single preset
@@ -24,12 +24,18 @@ module.exports = function(req, res) {
       const sql = `
         SELECT
           id, user_id, name, url_match AS urlMatch, description,
-          domains, is_listed AS isListed, created, updated
+          domains, is_listed AS isListed, created, updated, (
+            SELECT SUM(vote) FROM votes WHERE target_id = ? AND target_type = 2
+          ) AS votes, (
+            SELECT SUM(downloads) FROM downloads
+            WHERE target_id = ? AND target_type = 2
+          ) AS downloads, (
+            SELECT COUNT(id) FROM comments
+            WHERE target_id = ? AND target_type = 2
+          ) AS comments
         FROM presets WHERE id = ?
       `,
-      vars = [
-        req.params.preset
-      ];
+      vars = new Array(4).fill(req.params.preset);
 
       return db.query(sql, vars);
     })
