@@ -87,7 +87,9 @@ module.exports = function(req, res) {
       });
 
       sql = `
-        SELECT * FROM preset_buttons WHERE preset_id IN (?)
+        SELECT
+          preset_id, button_id AS id, size, position, styles
+        FROM preset_buttons WHERE preset_id IN (?)
       `,
       vars = [
         downloads
@@ -100,6 +102,7 @@ module.exports = function(req, res) {
       rows.forEach(r => {
         for (let i = 0; i < response.presets.length; i++) {
           if (r.preset_id == response.presets[i].id) {
+            delete r.preset_id;
             response.presets[i].buttons.push(r);
             break;
           }
