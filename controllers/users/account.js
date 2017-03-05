@@ -11,7 +11,7 @@ const config = require('config');
   RETURN
     {
       loggedIn: boolean,
-      subscription?: number, uid?: number, referral?: {
+      name?: string, subscription?: number, uid?: number, referral?: {
         affiliate?: string, referral?: string,
         hasMadePurchase?: boolean
       }
@@ -37,7 +37,8 @@ module.exports = function(req, res) {
 
       // Get user's account info
       const sql = `
-        SELECT xyfir_id, subscription, xad_id, referral
+        SELECT
+          xyfir_id, subscription, xad_id, referral, display_name AS name
         FROM users WHERE user_id = ?
       `,
       vars = [
@@ -66,7 +67,7 @@ module.exports = function(req, res) {
             req.session.subscription = rows[0].subscription;
 
             res.json({
-              loggedIn: true, uid: token.user,
+              loggedIn: true, uid: token.user, name: rows[0].name,
               subscription: rows[0].subscription,
               referral: JSON.parse(rows[0].referral)
             });
@@ -80,7 +81,7 @@ module.exports = function(req, res) {
         
         res.json({
           loggedIn: true, uid: 1, subscription: rows[0].subscription,
-          referral: JSON.parse(rows[0].referral)
+          referral: JSON.parse(rows[0].referral), name: rows[0].name
         });
       }
     })
@@ -92,6 +93,6 @@ module.exports = function(req, res) {
       req.session.subscription = 0;
 
       res.json({ loggedIn: false });
-    })
+    });
 
 };
