@@ -8,12 +8,12 @@ const mysql = require('lib/mysql');
     { error: boolean, message?: string, id?: number }
   DESCRIPTION
     Allow user to comment on target object
-    Accepted targets: button, preset
+    Accepted targets: button, preset, user profile
 */
 module.exports = function(req, res) {
 
   const table = [
-    '', 'buttons', 'presets'
+    '', 'buttons', 'presets', '', 'users'
   ][+req.params.type];
 
   try {
