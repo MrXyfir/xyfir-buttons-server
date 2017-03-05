@@ -21,14 +21,17 @@ module.exports = function(req, res) {
       const sql = `
         SELECT
           id, display_name AS name, joined, reputation, (
-            SELECT COUNT(id) FROM buttons WHERE user_id = ?
+            SELECT COUNT(id) FROM buttons WHERE user_id = ? AND is_listed = 1
           ) AS buttons, (
-            SELECT COUNT(id) FROM presets WHERE user_id = ?
-          ) AS presets
+            SELECT COUNT(id) FROM presets WHERE user_id = ? AND is_listed = 1
+          ) AS presets, (
+            SELECT COUNT(id) FROM comments
+            WHERE target_id = ? AND target_type = 4
+          ) AS comments
         FROM users
         WHERE id = ?
       `,
-      vars = Array(3).fill(req.params.user);
+      vars = Array(4).fill(req.params.user);
 
       return db.query(sql, vars);
     })
