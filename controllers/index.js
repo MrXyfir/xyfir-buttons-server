@@ -5,8 +5,14 @@ router.get(
   '/users', require('./users/get-matching')
 );
 router.get(
-  '/users/account', require('./users/account')
+  '/users/account', require('./users/account/get')
 );
+router.put(
+  '/users/account', require('./users/account/update')
+)
+router.post(
+  '/users/account/purchase', require('./users/account/purchase')
+)
 router.post(
   '/users/login', require('./users/login')
 );
