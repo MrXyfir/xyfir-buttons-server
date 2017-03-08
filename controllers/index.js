@@ -1,9 +1,6 @@
 const router = require('express').Router();
 
-/* USERS */
-router.get(
-  '/users', require('./users/get-matching')
-);
+/* USERS - ACCOUNT */
 router.get(
   '/users/account', require('./users/account/get')
 );
@@ -14,7 +11,12 @@ router.post(
   '/users/account/purchase', require('./users/account/purchase')
 )
 router.post(
-  '/users/login', require('./users/login')
+  '/users/account/login', require('./users/account/login')
+);
+
+/* USERS */
+router.get(
+  '/users', require('./users/get-matching')
 );
 router.get(
   '/users/:user', require('./users/get-single')
