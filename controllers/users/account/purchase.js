@@ -14,7 +14,7 @@ const config = require('config');
 function setSubscription(subscription, days) {
   return moment().unix() > subscription
     ? moment().add(days, 'days').unix()
-    : moment(subscription).add(days, 'days').unix();
+    : moment.unix(subscription).add(days, 'days').unix();
 }
 
 /**
@@ -65,7 +65,7 @@ function rewardAffiliate(aff, amount) {
   REQUIRED
     stripeToken: string, subscription: number
   RETURN
-    { error: boolean, message?: string }
+    { error: boolean, message?: string, subscription?: number }
   DESCRIPTION
     Add months to user's subscription after charging card via Stripe
 */
@@ -84,6 +84,7 @@ module.exports = async function(req, res) {
   try {
     if (!amount) throw 'Invalid subscription length';
 
+    await db.getConnection();
     const rows = await db.query(sql, vars);
 
     if (!rows.length) throw 'Could not find account';
@@ -124,13 +125,13 @@ module.exports = async function(req, res) {
     if (!result.affectedRows)
       throw 'An unknown error occured';
     else if (referral.referral)
-      await rewardReferrer(db, referral.referral, days);
+      await rewardReferrer(db, referral.referral, Math.round(days / 30) * 7);
     else if (referral.affiliate)
       await rewardAffiliate(referral.affiliate, amount);
     
     db.release();
     req.session.subscription = subscription;
-    res.json({ error: false });
+    res.json({ error: false, subscription });
   }
   catch (err) {
     db.release();
