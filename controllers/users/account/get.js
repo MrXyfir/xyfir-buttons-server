@@ -32,14 +32,14 @@ module.exports = function(req, res) {
       // User must provide access token if in production environment
       if (!req.query.token && !isDev)
         throw 'Access token required';
-      if (!isDev && !token.user || !token.token)
+      if (!isDev && (!token.user || !token.token))
         throw 'Invalid access token';
 
       // Get user's account info
       const sql = `
         SELECT
           xyfir_id, subscription, xad_id, referral, display_name AS name
-        FROM users WHERE user_id = ?
+        FROM users WHERE id = ?
       `,
       vars = [
         isDev ? 1 : token.user
