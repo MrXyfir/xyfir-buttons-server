@@ -6,7 +6,7 @@ const mysql = require('lib/mysql');
 const config = require('config');
 
 /*
-  POST api/users/login
+  POST api/users/account/login
   REQUIRED
     xid: string, auth: string
   RETURN
