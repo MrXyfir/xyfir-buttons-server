@@ -17,11 +17,11 @@ module.exports = function(req, res) {
         INSERT INTO buttons
           (
             user_id, name, description, is_listed, url_match, domains, tooltip,
-            script, repository, styles, icon
+            script, repository, styles, content
           )
           SELECT
             ?, name, description, is_listed, url_match, domains, tooltip,
-            script, repository, styles, icon
+            script, repository, styles, content
           FROM buttons
           WHERE id = ?
       `,

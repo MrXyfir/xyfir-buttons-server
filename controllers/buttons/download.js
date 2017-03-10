@@ -9,8 +9,8 @@ const mysql = require('lib/mysql');
     {
       error: boolean, message?: string, buttons?: [{
         id: number, creator: number, name: string, description: string,
+        created: date-string, updated: date-string, content: string,
         isListed: boolean, urlMatch: string, script: json-string,
-        created: date-string, updated: date-string, icon: string,
         domains: string, tooltip: string, styles: string
       }]
     }
@@ -63,7 +63,7 @@ module.exports = async function(req, res) {
       SELECT
         id, name, user_id AS creator, description, domains, script, created,
         updated, is_listed AS isListed, url_match AS urlMatch, updated,
-        repository, tooltip, styles, icon
+        repository, tooltip, styles, content
       FROM buttons WHERE id IN (?)
     `,
     vars = [

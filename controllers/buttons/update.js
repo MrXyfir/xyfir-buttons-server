@@ -9,7 +9,7 @@ const mysql = require('lib/mysql');
     script: string OR repository: string,
   OPTIONAL
     description: string, domains: string, isListed: boolean,
-    tooltip: string, styles: string, icon: string
+    tooltip: string, styles: string, content: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -35,13 +35,13 @@ module.exports = function(req, res) {
         UPDATE buttons SET
           name = ?, description = ?, is_listed = ?, url_match = ?,
           domains = ?, script = ?, updated = NOW(), repository = ?,
-          tooltip = ?, styles = ?, icon = ?
+          tooltip = ?, styles = ?, content = ?
         WHERE id = ? AND user_id = ?
       `,
       vars = [
         button.name, button.description, button.is_listed, button.url_match,
         button.domains, button.script, button.repository,
-        button.tooltip, button.styles, button.icon,
+        button.tooltip, button.styles, button.content,
         req.params.button, req.session.uid
       ];
 

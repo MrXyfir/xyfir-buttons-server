@@ -8,7 +8,7 @@ const mysql = require('lib/mysql');
     script: string OR repository: string,
   OPTIONAL
     description: string, domains: string, isListed: boolean,
-    tooltip: string, styles: string, icon: string
+    tooltip: string, styles: string, content: string
   RETURN
     { error: boolean, message?: string, id?: number }
   DESCRIPTION
