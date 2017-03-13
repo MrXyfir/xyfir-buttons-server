@@ -10,8 +10,7 @@ const mysql = require('lib/mysql');
   OPTIONAL
     searchType: string
       'name|url|site|user|preset'
-    searchQuery: string
-    lastId: number
+    searchQuery: string, lastId: number, noLimit: boolean
   RETURN
     {
       buttons: [{
@@ -90,7 +89,7 @@ module.exports = function(req, res) {
         WHERE
           is_listed = 1 ${whereId} ${whereSearch}
         ORDER BY ${q.order} ${q.direction}
-        LIMIT 25
+        ${q.noLimit ? '' : 'LIMIT 25'}
       `,
       vars = [
         whereSearch ? (wrap ? ('%' + q.searchQuery + '%') : q.searchQuery) : ''
