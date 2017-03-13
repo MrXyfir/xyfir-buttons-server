@@ -123,7 +123,7 @@ module.exports = async function(req, res) {
     res.json(response);
   }
   catch (err) {
-    res.json({ error: false, message: err });
+    res.json({ error: true, message: err });
     return;
   }
 
