@@ -2,6 +2,7 @@ const encryptAccessToken = require('lib/users/encrypt-access-token');
 const signupWithReferral = require('lib/users/signup-with-referral');
 const request = require('superagent');
 const mysql = require('lib/mysql');
+const rword = require('rword');
 
 const config = require('config');
 
@@ -51,11 +52,12 @@ module.exports = function(req, res) {
           // User doesn't exist; create account
           if (!rows.length) {
             sql = `
-              INSERT INTO users (xyfir_id, email, xad_id)
-              VALUES (?, ?, ?)
+              INSERT INTO users (xyfir_id, email, xad_id, display_name)
+              VALUES (?, ?, ?, ?)
             `,
             vars = [
-              req.body.xid, xaccResult.body.email, xaccResult.body.xadid
+              req.body.xid, xaccResult.body.email, xaccResult.body.xadid,
+              rword.generateFromPool(2).join('')
             ],
             createAccount = true;
 
