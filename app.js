@@ -29,6 +29,7 @@ app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 
 // Express middleware / controllers
+app.use('/static', express.static(__dirname + '/static'));
 app.use(
   '/api',
   require('middleware/override-res-json'),
@@ -40,5 +41,5 @@ app.get('/*', (req, res) => {
     req.session.uid = 1,
     req.session.subscription = moment().add(1, 'days').unix();
   }
-  res.sendFile(__dirname + '/views/Home.html');
+  res.sendFile(__dirname + '/static/Home.html');
 });
