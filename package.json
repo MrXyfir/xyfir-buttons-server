@@ -13,14 +13,14 @@
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "express-mysql-session": "^1.2.0",
-    "express-session": "^1.15.1",
-    "moment": "^2.17.1",
+    "express-session": "^1.15.2",
+    "moment": "^2.18.1",
     "mysql": "^2.13.0",
     "rword": "^2.1.0",
-    "stripe": "^4.15.1",
-    "superagent": "^3.5.0"
+    "stripe": "^4.17.1",
+    "superagent": "^3.5.2"
   },
   "devDependencies": {
-    "node-sass": "^4.5.0"
+    "node-sass": "^4.5.2"
   }
 }
