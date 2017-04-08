@@ -1,5 +1,9 @@
 const router = require('express').Router();
 
+router.get(
+  '/ads', require('./ads')
+);
+
 /* USERS - ACCOUNT */
 router.get(
   '/users/account', require('./users/account/get')
