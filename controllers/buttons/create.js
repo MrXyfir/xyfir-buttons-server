@@ -8,7 +8,7 @@ const mysql = require('lib/mysql');
     script: string OR repository: string,
   OPTIONAL
     description: string, domains: string, isListed: boolean,
-    tooltip: string, styles: string, content: string
+    tooltip: string, styles: string, content: string, key: boolean
   RETURN
     { error: boolean, message?: string, id?: number }
   DESCRIPTION
@@ -37,7 +37,10 @@ module.exports = function(req, res) {
       if (!result.insertId) throw 'Could not create button';
 
       db.release();
-      res.json({ error: false, id: result.insertId });
+      
+      const response = { error: false, id: result.insertId };
+      if (button.modifier_key) response.modifierKey = button.modifier_key;
+      res.json(response);
     })
     .catch(err => {
       db.release();

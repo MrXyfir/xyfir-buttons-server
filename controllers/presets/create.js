@@ -6,7 +6,7 @@ const mysql = require('lib/mysql');
   REQUIRED
     name: string, urlMatch: string
   OPTIONAL
-    description: string, domains: string, isListed: boolean
+    description: string, domains: string, isListed: boolean, key: boolean
   RETURN
     { error: boolean, message?: string, id?: number }
   DESCRIPTION
@@ -35,7 +35,10 @@ module.exports = function(req, res) {
       if (!result.insertId) throw 'Could not create preset';
 
       db.release();
-      res.json({ error: false, id: result.insertId });
+
+      const response = { error: false, id: result.insertId };
+      if (preset.modifier_key) response.modifierKey = preset.modifier_key;
+      res.json(response);
     })
     .catch(err => {
       db.release();
