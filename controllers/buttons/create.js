@@ -10,7 +10,7 @@ const mysql = require('lib/mysql');
     description: string, domains: string, isListed: boolean,
     tooltip: string, styles: string, content: string, key: boolean
   RETURN
-    { error: boolean, message?: string, id?: number }
+    { error: boolean, message?: string, id?: number, modKey?: string }
   DESCRIPTION
     Create a button
     If user is not logged in, the creator is anonymous
@@ -39,7 +39,7 @@ module.exports = function(req, res) {
       db.release();
       
       const response = { error: false, id: result.insertId };
-      if (button.modifier_key) response.modifierKey = button.modifier_key;
+      if (button.mod_key) response.modKey = button.mod_key;
       res.json(response);
     })
     .catch(err => {

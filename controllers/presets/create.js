@@ -8,7 +8,7 @@ const mysql = require('lib/mysql');
   OPTIONAL
     description: string, domains: string, isListed: boolean, key: boolean
   RETURN
-    { error: boolean, message?: string, id?: number }
+    { error: boolean, message?: string, id?: number, modKey?: string }
   DESCRIPTION
     Creates a preset
     If user is not logged in, the creator is anonymous
@@ -37,7 +37,7 @@ module.exports = function(req, res) {
       db.release();
 
       const response = { error: false, id: result.insertId };
-      if (preset.modifier_key) response.modifierKey = preset.modifier_key;
+      if (preset.mod_key) response.modKey = preset.mod_key;
       res.json(response);
     })
     .catch(err => {
