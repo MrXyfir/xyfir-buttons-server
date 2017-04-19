@@ -8,7 +8,7 @@ const mysql = require('lib/mysql');
     name: string, urlMatch: string,
     script: string OR repository: string,
   OPTIONAL
-    description: string, domains: string, isListed: boolean,
+    modKey: string, description: string, domains: string, isListed: boolean,
     tooltip: string, styles: string, content: string
   RETURN
     { error: boolean, message?: string }
@@ -36,13 +36,13 @@ module.exports = function(req, res) {
           name = ?, description = ?, is_listed = ?, url_match = ?,
           domains = ?, script = ?, updated = NOW(), repository = ?,
           tooltip = ?, styles = ?, content = ?
-        WHERE id = ? AND user_id = ?
+        WHERE id = ? AND (user_id = ? OR mod_key = ?)
       `,
       vars = [
         button.name, button.description, button.is_listed, button.url_match,
         button.domains, button.script, button.repository,
         button.tooltip, button.styles, button.content,
-        req.params.button, req.session.uid
+        req.params.button, req.session.uid, button.mod_key || '-'
       ];
 
       return db.query(sql, vars);

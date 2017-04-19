@@ -3,6 +3,8 @@ const mysql = require('lib/mysql');
 
 /*
   PUT api/presets/:preset/buttons/:button
+  OPTIONAL
+    modKey: string
   REQUIRED
     size: string, position: string, styles: string
   RETURN
@@ -23,13 +25,14 @@ module.exports = function(req, res) {
           size = ?, position = ?, styles = ?
         WHERE
           button_id = ? AND preset_id IN (
-            SELECT id FROM presets WHERE id = ? AND user_id = ?
+            SELECT id FROM presets
+            WHERE id = ? AND (user_id = ? OR mod_key = ?)
           )
       `,
       vars = [
         req.body.size, req.body.position, (req.body.styles || '{}'),
         req.params.button,
-        req.params.preset, req.session.uid
+        req.params.preset, req.session.uid, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);

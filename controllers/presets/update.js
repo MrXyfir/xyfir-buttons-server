@@ -6,7 +6,7 @@ const mysql = require('lib/mysql');
   REQUIRED
     name: string, urlMatch: string
   OPTIONAL
-    description: string, domains: string, isListed: boolean
+    description: string, domains: string, isListed: boolean, modKey: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -32,12 +32,12 @@ module.exports = function(req, res) {
         UPDATE presets SET
           name = ?, description = ?, is_listed = ?, updated = NOW(),
           domains = ?, url_match = ?
-        WHERE id = ? AND user_id = ?
+        WHERE id = ? AND (user_id = ? OR mod_key = ?)
       `,
       vars = [
         preset.name, preset.description, preset.is_listed,
         preset.url_match, preset.domains,
-        req.params.preset, req.session.uid
+        req.params.preset, req.session.uid, preset.mod_key || '-'
       ];
 
       return db.query(sql, vars);

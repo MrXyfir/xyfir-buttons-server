@@ -5,6 +5,8 @@ const mysql = require('lib/mysql');
   POST api/presets/:preset/buttons/:button
   REQUIRED
     size: string, position: string, styles: string
+  OPTIONAL
+    modKey: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -20,7 +22,8 @@ module.exports = function(req, res) {
       // Get data for validations
       sql = `
         SELECT (
-          SELECT COUNT(id) FROM presets WHERE id = ? AND user_id = ?
+          SELECT COUNT(id) FROM presets
+          WHERE id = ? AND (user_id = ? OR mod_key = ?)
         ) AS presetExists, (
           SELECT COUNT(id) FROM buttons WHERE id = ?
         ) AS buttonExists, (
@@ -29,7 +32,7 @@ module.exports = function(req, res) {
         ) AS buttonInPreset
       `,
       vars = [
-        req.params.preset, req.session.uid,
+        req.params.preset, req.session.uid, req.body.modKey || '-',
         req.params.button,
         req.params.preset, req.params.button
       ];

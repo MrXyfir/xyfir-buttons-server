@@ -3,6 +3,8 @@ const mysql = require('lib/mysql');
 
 /*
   DELETE api/presets/:preset
+  OPTIONAL
+    modKey: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -18,10 +20,10 @@ module.exports = function(req, res) {
       // Delete preset if user owns it
       // This will also delete from preset_buttons table
       const sql = `
-        DELETE FROM presets WHERE id = ? AND user_id = ?
+        DELETE FROM presets WHERE id = ? AND (user_id = ? OR mod_key = ?)
       `,
       vars = [
-        req.params.preset, req.session.uid
+        req.params.preset, req.session.uid, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);

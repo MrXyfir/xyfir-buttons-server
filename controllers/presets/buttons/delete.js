@@ -3,6 +3,8 @@ const mysql = require('lib/mysql');
 
 /*
   DELETE api/presets/:preset/buttons/:button
+  OPTIONAL
+    modKey: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -18,12 +20,13 @@ module.exports = function(req, res) {
         DELETE FROM preset_buttons
         WHERE
           button_id = ? AND preset_id IN (
-            SELECT id FROM presets WHERE id = ? AND user_id = ?
+            SELECT id FROM presets
+            WHERE id = ? AND (user_id = ? OR mod_key = ?)
           )
       `,
       vars = [
         req.params.button,
-        req.params.preset, req.session.uid
+        req.params.preset, req.session.uid, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);

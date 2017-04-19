@@ -4,6 +4,8 @@ const mysql = require('lib/mysql');
 
 /*
   DELETE api/buttons/:button
+  OPTIONAL
+    modKey: string
   RETURN
     { error: boolean, message?: string }
   DESCRIPTION
@@ -35,10 +37,10 @@ module.exports = function(req, res) {
       // Delete button if user owns it
       // This will also delete from preset_buttons table
       sql = `
-        DELETE FROM buttons WHERE id = ? AND user_id = ?
+        DELETE FROM buttons WHERE id = ? AND (user_id = ? OR mod_key = ?)
       `,
       vars = [
-        req.params.button, req.session.uid
+        req.params.button, req.session.uid, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);
