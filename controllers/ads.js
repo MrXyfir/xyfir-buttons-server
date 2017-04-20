@@ -22,7 +22,6 @@ module.exports = async function(req, res) {
     res.json(response.body.ads[0]);
   }
   catch (e) {
-    console.log('e', e);
     res.json({});
   }
 
