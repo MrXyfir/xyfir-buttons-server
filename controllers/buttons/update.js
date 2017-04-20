@@ -42,7 +42,7 @@ module.exports = function(req, res) {
         button.name, button.description, button.is_listed, button.url_match,
         button.domains, button.script, button.repository,
         button.tooltip, button.styles, button.content,
-        req.params.button, req.session.uid, button.mod_key || '-'
+        req.params.button, req.session.uid || -1, button.mod_key || '-'
       ];
 
       return db.query(sql, vars);

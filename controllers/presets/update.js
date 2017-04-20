@@ -37,7 +37,7 @@ module.exports = function(req, res) {
       vars = [
         preset.name, preset.description, preset.is_listed,
         preset.url_match, preset.domains,
-        req.params.preset, req.session.uid, preset.mod_key || '-'
+        req.params.preset, req.session.uid || -1, preset.mod_key || '-'
       ];
 
       return db.query(sql, vars);

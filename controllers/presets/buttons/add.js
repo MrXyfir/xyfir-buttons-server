@@ -32,7 +32,7 @@ module.exports = function(req, res) {
         ) AS buttonInPreset
       `,
       vars = [
-        req.params.preset, req.session.uid, req.body.modKey || '-',
+        req.params.preset, req.session.uid || -1, req.body.modKey || '-',
         req.params.button,
         req.params.preset, req.params.button
       ];

@@ -23,7 +23,7 @@ module.exports = function(req, res) {
         DELETE FROM presets WHERE id = ? AND (user_id = ? OR mod_key = ?)
       `,
       vars = [
-        req.params.preset, req.session.uid, req.body.modKey || '-'
+        req.params.preset, req.session.uid || -1, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);

@@ -32,7 +32,7 @@ module.exports = function(req, res) {
       vars = [
         req.body.size, req.body.position, (req.body.styles || '{}'),
         req.params.button,
-        req.params.preset, req.session.uid, req.body.modKey || '-'
+        req.params.preset, req.session.uid || -1, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);

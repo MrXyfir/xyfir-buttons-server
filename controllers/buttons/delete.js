@@ -40,7 +40,7 @@ module.exports = function(req, res) {
         DELETE FROM buttons WHERE id = ? AND (user_id = ? OR mod_key = ?)
       `,
       vars = [
-        req.params.button, req.session.uid, req.body.modKey || '-'
+        req.params.button, req.session.uid || -1, req.body.modKey || '-'
       ];
 
       return db.query(sql, vars);
