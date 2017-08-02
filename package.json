@@ -13,13 +13,14 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "express-mysql-session": "^1.2.1",
-    "express-session": "^1.15.3",
+    "express-session": "^1.15.4",
     "moment": "^2.18.1",
-    "mysql": "^2.13.0",
+    "mysql": "^2.14.1",
     "randomstring": "^1.1.5",
     "rword": "^2.1.0",
-    "stripe": "^4.22.0",
-    "superagent": "^3.5.2"
+    "stripe": "^4.23.1",
+    "superagent": "^3.5.2",
+    "xyfir-ads": "^1.0.0"
   },
   "devDependencies": {
     "node-sass": "^4.5.3"
