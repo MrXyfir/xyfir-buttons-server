@@ -1,28 +1,18 @@
-const request = require('superagent');
-
-const config = require('config');
+const xyfirAds = require('xyfir-ads');
 
 /*
-  GET api/ads
-  OPTIONAL
-    keywords: string
+  GET api/ad
   RETURN
-    { type: number, link: string, title: string, description: string }
+    https://github.com/Xyfir/Ads/blob/master/ads.json
+    XyfirAds[i].ad
 */
 module.exports = async function(req, res) {
 
-  try {
-    const response = await request
-      .get(config.addresses.xads)
-      .query({
-        pubid: 6, types: '1,2', count: 1, ip: req.ip,
-        keywords: (req.body.keywords || '')
-      });
-    
-    res.json(response.body.ads[0]);
-  }
-  catch (e) {
+  const ads = await xyfirAds({ blacklist: ['xyButtons'] });
+
+  if (!ads.length)
     res.json({});
-  }
+  else
+    res.json(ads[0].ad);
 
 }
